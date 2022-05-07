@@ -29,3 +29,7 @@ class Ad(models.Model):
     class Meta():
         verbose_name = 'Объявление'
         verbose_name_plural = 'Объявления'
+
+    @property
+    def username(self):
+        return self.user.username if self.user else None
