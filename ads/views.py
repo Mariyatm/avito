@@ -5,10 +5,13 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 
-from ads.models import Ad, Cat
-from ads.serializers import AdDetailSerializer, AdListSerializer, AdCreateSerializer
+from ads.models import Ad, Cat, Selection
+from ads.permissions import SelectionUpdatePermission
+from ads.serializers import AdDetailSerializer, AdListSerializer, AdCreateSerializer,  \
+    SelectionSerializer
 
 
 def index(request):
@@ -47,6 +50,7 @@ class AdListView(ListAPIView):
 class AdDetailView(RetrieveAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdDetailSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class AdCreateView(CreateAPIView):
@@ -164,5 +168,19 @@ class CatUpdateView(UpdateView):
             "name": self.object.name,
         })
 
+class SelectionDetailView(RetrieveAPIView):
+    queryset = Selection.objects.all()
+    serializer_class = SelectionSerializer
+
+
+class SelectionUpdateView(UpdateAPIView):
+    queryset = Selection.objects.all()
+    serializer_class = SelectionSerializer
+    permission_classes = [IsAuthenticated, SelectionUpdatePermission]
+
+class SelectionDeleteView(DestroyAPIView):
+    queryset = Selection.objects.all()
+    serializer_class = SelectionSerializer
+    permission_classes = [IsAuthenticated, SelectionUpdatePermission]
 
 

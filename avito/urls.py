@@ -34,6 +34,8 @@ urlpatterns = [
     path('cat/<int:pk>', views.CatDetailView.as_view()),
     path('cat/<int:pk>/update', views.CatUpdateView.as_view()),
     path('cat/create', views.CatCreateView.as_view()),
+    path('selection/<int:pk>', views.SelectionDetailView.as_view()),
+    path('selection/<int:pk>/update', views.SelectionUpdateView.as_view()),
     path('ad/', include('ads.urls')),
     path('user/', include('users.urls')),
 ]

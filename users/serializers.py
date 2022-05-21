@@ -8,7 +8,13 @@ from users.models import User, Location
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "name", "price", "is_published", "username"]
+        fields = "__all__"
+
+    def create(self, validated_data):
+        user = super().create(validated_data)
+        user.set_password(user.password)
+        user.save()
+        return user
 
 
 class LocationSerializer(serializers.ModelSerializer):

@@ -33,3 +33,9 @@ class Ad(models.Model):
     @property
     def username(self):
         return self.user.username if self.user else None
+
+
+class Selection(models.Model):
+    name = models.CharField(max_length=50)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    ads = models.ManyToManyField(Ad)

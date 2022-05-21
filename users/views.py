@@ -7,11 +7,15 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
+from rest_framework import status
+from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from avito import settings
 from users.models import User, Location
-from users.serializers import LocationSerializer
+from users.serializers import LocationSerializer, UserCreateSerializer
 
 
 class UserListView(ListView):
@@ -37,8 +41,8 @@ class UserListView(ListView):
             users.append({
                 "id": user.id,
                 "username": user.username,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
+                # "first_name": user.first_name,
+                # "last_name": user.last_name,
                 "role": user.role,
                 "age": user.age,
                 "locations": list(map(str, user.locations.all())),
@@ -69,35 +73,16 @@ class UserDetailView(DetailView):
         })
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class UserCreateView(CreateView):
+
+class UserCreateView(CreateAPIView):
     model = User
-    fields = ["first_name", "last_name", "role", "age", "locations", "username"]
+    serializer_class = UserCreateSerializer
 
-    def post(self, request, *args, **kwargs):
-        user_data = json.loads(request.body)
 
-        user = User.objects.create(
-            first_name=user_data["first_name"],
-            last_name=user_data["last_name"],
-            username=user_data["username"],
-            role=user_data["role"],
-            age=user_data["age"],
-        )
-        for location in user_data["locations"]:
-            loc_obj, created = Location.objects.get_or_create(name=location)
-            user.locations.add(loc_obj)
-        user.save()
-
-        return JsonResponse({
-            "id": user.id,
-            "username": user.username,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "role": user.role,
-            "age": user.age,
-            "locations": list(map(str, user.locations.all())),
-        })
+class Logout(APIView):
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
